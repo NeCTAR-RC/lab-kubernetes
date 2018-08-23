@@ -2,6 +2,7 @@
 
 - name: Base
   hosts: all
+  become: true
   tasks:
     - name: Ping
       ping:
@@ -43,6 +44,7 @@
 
 - name: Master and Worker Nodes
   hosts: master,worker
+  become: true
   tasks:
     - name: Ping
       ping:
@@ -82,6 +84,7 @@
 
 - name: Master Node
   hosts: master
+  become: true
   tasks:
     - name: Ping
       ping:
@@ -120,6 +123,7 @@
 
 - name: Worker Nodes
   hosts: worker
+  become: true
   tasks:
     - name: Ping
       ping:
