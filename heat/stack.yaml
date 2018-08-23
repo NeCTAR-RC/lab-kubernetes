@@ -14,13 +14,13 @@ parameters:
     label: "Lab Repo"
     description: "Lab Repo"
     type: string
-    default: "https://github.com/cloud-training/lab-kubernetes.git"
+    default: "https://github.com/waipeng/lab-kubernetes.git"
 
   lab_repo_version:
     label: "Lab Repo Version"
     description: "Lab Repo Version"
     type: string
-    default: "v1.0.2"
+    default: "master"
 
 resources:
 
@@ -54,13 +54,12 @@ resources:
           template: "%prefix%-master"
           params:
             "%prefix%": { get_attr: [prefix, output] }
-      flavor: "2 GB Performance"
-      image: "Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)"
+      flavor: "m2.small"
+      image: "NeCTAR Ubuntu 16.04 LTS (Xenial) amd64"
       admin_pass: { get_resource: password }
       key_name: { get_resource: keypair }
       networks:
         - { uuid: 00000000-0000-0000-0000-000000000000 }
-        - { uuid: 11111111-1111-1111-1111-111111111111 }
 
   server_worker_nodes:
     type: OS::Heat::ResourceGroup
@@ -74,13 +73,12 @@ resources:
               template: "%prefix%-worker-%index%"
               params:
                 "%prefix%": { get_attr: [prefix, output] }
-          flavor: "1 GB Performance"
-          image: "Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)"
+          flavor: "m2.small"
+          image: "NeCTAR Ubuntu 16.04 LTS (Xenial) amd64"
           admin_pass: { get_resource: password }
           key_name: { get_resource: keypair }
           networks:
             - { uuid: 00000000-0000-0000-0000-000000000000 }
-            - { uuid: 11111111-1111-1111-1111-111111111111 }
 
   swift_signal_handle:
     type: OS::Heat::SwiftSignalHandle
@@ -96,9 +94,11 @@ resources:
     type: OS::Heat::CloudConfig
     properties:
       cloud_config:
+        disable_root: false
         bootcmd:
           - sleep 15
         packages:
+          - ansible
           - tmux
           - multitail
           - git
@@ -190,13 +190,12 @@ resources:
           template: "%prefix%-ansible"
           params:
             "%prefix%": { get_attr: [prefix, output] }
-      flavor: "512MB Standard Instance"
-      image: "Ubuntu 16.04 LTS (Xenial Xerus) (PVHVM)"
+      flavor: "m2.xsmall"
+      image: "NeCTAR Ubuntu 16.04 LTS (Xenial) amd64"
       admin_pass: { get_resource: password }
       key_name: { get_resource: keypair }
       networks:
         - { uuid: 00000000-0000-0000-0000-000000000000 }
-        - { uuid: 11111111-1111-1111-1111-111111111111 }
       config_drive: True
       user_data_format: RAW
       user_data: { get_resource: cloud_config_ansible }
