@@ -60,6 +60,8 @@ resources:
       key_name: { get_resource: keypair }
       networks:
         - { uuid: 00000000-0000-0000-0000-000000000000 }
+      user_data_format: RAW
+      user_data: { get_resource: cloud_config }
 
   server_worker_nodes:
     type: OS::Heat::ResourceGroup
@@ -79,6 +81,8 @@ resources:
           key_name: { get_resource: keypair }
           networks:
             - { uuid: 00000000-0000-0000-0000-000000000000 }
+          user_data_format: RAW
+          user_data: { get_resource: cloud_config }
 
   swift_signal_handle:
     type: OS::Heat::SwiftSignalHandle
@@ -90,11 +94,32 @@ resources:
       count: 1
       timeout: 14400
 
-  cloud_config_ansible:
+  cloud_config:
     type: OS::Heat::CloudConfig
     properties:
       cloud_config:
         disable_root: false
+        system_info:
+          default_user:
+            lock_passwd: False
+        ssh_pwauth: yes
+        password: { get_resource: password }
+        chpasswd:
+          expire: false
+        packages:
+          - vim
+
+  cloud_config_ansible:
+    type: OS::Heat::CloudConfig
+    properties:
+      cloud_config:
+        system_info:
+          default_user:
+            lock_passwd: False
+        ssh_pwauth: yes
+        password: { get_resource: password }
+        chpasswd:
+          expire: false
         bootcmd:
           - sleep 15
         packages:
