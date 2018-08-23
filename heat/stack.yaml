@@ -116,9 +116,9 @@ resources:
             permissions: "0600"
             content: |
               [all]
-              master ansible_ssh_host={{ master_node_ip_address }}
+              master ansible_ssh_host={{ master_node_ip_address }} ansible_user=ubuntu
               {% for worker_node_ip_address in worker_nodes_ip_address %}
-              worker-{{ loop.index0 }} ansible_ssh_host={{ worker_node_ip_address }}
+              worker-{{ loop.index0 }} ansible_ssh_host={{ worker_node_ip_address }} ansible_user=ubuntu
               {% endfor %}
               
               [master]
