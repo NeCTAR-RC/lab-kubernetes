@@ -108,7 +108,13 @@ resources:
           - libffi-dev
           - python-dev
           - python-virtualenv
+          - vim
         write_files:
+          - path: "/etc/apt/preferences.d/backports.pref"
+            content: |
+              Package: ansible
+              Pin: release a=xenial-backports
+              Pin-Priority: 500
           - path: "/opt/cloud-training/id_rsa"
             permissions: "0600"
             content: { get_attr: [keypair, private_key] }
