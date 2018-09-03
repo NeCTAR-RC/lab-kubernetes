@@ -22,6 +22,12 @@ parameters:
     type: string
     default: "master"
 
+  availability_zone:
+    label: "Availability Zone"
+    description: "The availability zone for resources to be created in"
+    type: string
+    default: ""
+
 resources:
 
   prefix:
@@ -46,6 +52,73 @@ resources:
           params:
             "%prefix%": { get_attr: [prefix, output] }
 
+  secgroup:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name:
+        str_replace:
+          template: "%prefix%-secgroup"
+          params:
+            "%prefix%": { get_attr: [prefix, output] }
+
+  master_secgroup_rules:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name:
+        str_replace:
+          template: "%prefix%-secgroup-master"
+          params:
+            "%prefix%": { get_attr: [prefix, output] }
+      rules:
+        - remote_group_id: { get_resource: secgroup }
+          remote_mode: remote_group_id
+          protocol: tcp
+          port_range_min: 1
+          port_range_max: 65535
+
+        - remote_group_id: { get_resource: secgroup }
+          remote_mode: remote_group_id
+          protocol: udp
+          port_range_min: 1
+          port_range_max: 65535
+
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 22
+          port_range_max: 22
+
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: tcp
+          port_range_min: 443
+          port_range_max: 443
+
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+
+  worker_secgroup_rules:
+    type: OS::Neutron::SecurityGroup
+    properties:
+      name:
+        str_replace:
+          template: "%prefix%-secgroup-worker"
+          params:
+            "%prefix%": { get_attr: [prefix, output] }
+      rules:
+        - remote_group_id: { get_resource: secgroup }
+          remote_mode: remote_group_id
+          protocol: tcp
+          port_range_min: 1
+          port_range_max: 65535
+
+        - remote_group_id: { get_resource: secgroup }
+          remote_mode: remote_group_id
+          protocol: udp
+          port_range_min: 1
+          port_range_max: 65535
+
+        - remote_ip_prefix: 0.0.0.0/0
+          protocol: icmp
+
   server_master_node:
     type: OS::Nova::Server
     properties:
@@ -58,6 +131,8 @@ resources:
       image: "NeCTAR Ubuntu 16.04 LTS (Xenial) amd64"
       admin_pass: { get_resource: password }
       key_name: { get_resource: keypair }
+      availability_zone: { get_param: availability_zone }
+      security_groups: [ { get_resource: secgroup }, { get_resource: master_secgroup_rules } ]
       networks:
         - { uuid: 00000000-0000-0000-0000-000000000000 }
       user_data_format: RAW
@@ -79,6 +154,8 @@ resources:
           image: "NeCTAR Ubuntu 16.04 LTS (Xenial) amd64"
           admin_pass: { get_resource: password }
           key_name: { get_resource: keypair }
+          availability_zone: { get_param: availability_zone }
+          security_groups: [ { get_resource: secgroup }, { get_resource: worker_secgroup_rules } ]
           networks:
             - { uuid: 00000000-0000-0000-0000-000000000000 }
           user_data_format: RAW
@@ -225,6 +302,8 @@ resources:
       image: "NeCTAR Ubuntu 16.04 LTS (Xenial) amd64"
       admin_pass: { get_resource: password }
       key_name: { get_resource: keypair }
+      availability_zone: { get_param: availability_zone }
+      security_groups: [ { get_resource: secgroup }, { get_resource: master_secgroup_rules } ]
       networks:
         - { uuid: 00000000-0000-0000-0000-000000000000 }
       config_drive: True
