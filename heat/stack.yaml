@@ -34,7 +34,6 @@ resources:
     type: OS::Heat::TestResource
     properties:
       value: { get_param: "OS::stack_name" }
-      # value: { str_split : ["-", { get_param: "OS::stack_id" }, 0] }
 
   password:
     type: OS::Heat::RandomString
@@ -267,11 +266,8 @@ resources:
                   cd /opt/cloud-training/lab
                   git checkout %lab_repo_version% || exit_failure "Git Checkout - %lab_repo_version%"
                   cd /opt/cloud-training/lab/ansible
-                  virtualenv .venv || exit_failure "Create Virtual Environment"
-                  source .venv/bin/activate || exit_failure "Activate Virtual Environment"
-                  pip install -r requirements.txt || exit_failure "PIP Install Requirements"
                   ansible localhost -e @/opt/cloud-training/environment.yaml -m template -a "src=/opt/cloud-training/hosts.j2 dest=/opt/cloud-training/hosts" || exit_failure "Ansible Inventory Template"
-                  ansible-playbook playbook.yaml -vv || exit_failure "Ansible Playbook Run"
+                  ansible-playbook playbook.yaml -vv || exit_failure "Ansible Playbook run failed"
                   exit_success
                 params:
                   "%swift_signal_notify%": { get_attr: [swift_signal_handle, curl_cli] }
