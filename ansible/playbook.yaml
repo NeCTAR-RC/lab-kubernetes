@@ -97,14 +97,19 @@
 
     - name: Create Kubectl Config Directory
       file:
-        path: "/root/.kube"
+        path: "/home/ubuntu/.kube"
+        owner: ubuntu
+        group: ubuntu
         state: directory
 
-    - name: Symlink Kubectl Config File
-      file:
+    - name: Copy Kubectl Config File
+      copy:
         src: "/etc/kubernetes/admin.conf"
-        dest: "/root/.kube/config"
-        state: link
+        dest: "/home/ubuntu/.kube/config"
+        remote_src: yes
+        owner: ubuntu
+        group: ubuntu
+        mode: 0600
 
     - name: Configure Flannel CNI
       command: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml"
