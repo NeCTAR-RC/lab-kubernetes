@@ -111,7 +111,7 @@
 
     - name: Set permissions on Kubectl config file
       file:
-        src: "/etc/kubernetes/admin.conf"
+        path: "/etc/kubernetes/admin.conf"
         mode: 0644
 
     - name: Symlink Kubectl Config File
