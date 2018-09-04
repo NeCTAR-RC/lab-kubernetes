@@ -127,7 +127,14 @@
       git:
         repo: 'https://gitlab.unimelb.edu.au/jakey/kubernetes-exercises.git'
         dest: /home/ubuntu/lab
+        update: no
       become: ubuntu
+
+    - name: Set external IP in example
+      replace:
+        dest: /home/ubuntu/lab/exercise-2/service-external.yaml
+        regexp: '%EXTERNAL_IP%'
+        replace: "{{ ansible_eth0.ipv4.address }}"
 
     - name: Configure Flannel CNI
       command: "kubectl apply -f https://raw.githubusercontent.com/coreos/flannel/v0.9.1/Documentation/kube-flannel.yml"
