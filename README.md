@@ -8,7 +8,11 @@ There is no need to clone this repo. All necessary resources can be referred to 
 
 ### Install Requirements
 
-Install the OpenStack and Heat clients. An example of installing these into a virtual environment is provided below.
+Install the OpenStack and Heat clients. For Ubuntu, this will be:
+
+```
+apt-get install python-openstackclient python-heatclient
+```
 
 ## Process
 
@@ -17,7 +21,7 @@ Install the OpenStack and Heat clients. An example of installing these into a vi
 If you created a virtual environment above, ensure you have activated that virtual environment, and that the OpenStack and Heat clients are installed. Create your Kubernetes Lab by running the following command:
 
 ```
-$ openstack stack create --wait --template https://raw.githubusercontent.com/NeCTAR-RC/lab-kubernetes/master/heat/stack.yaml my-stack-name
+$ openstack stack create --wait --template https://raw.githubusercontent.com/NeCTAR-RC/lab-kubernetes/master/heat/stack.yaml lab-kubernetes-01
 ```
 
 This will generate a Heat (Orchestration) Stack containing all the necessary resources for your Kubernes Lab, bootstrap the Master Node, and join any Worker Nodes if specified.
@@ -35,7 +39,7 @@ The `lab_repo_version` parameter allows specifying an alternative version to che
 Check on the status of your Lab build by running the following command:
 
 ```
-$ openstack stack show my-stack-name
+$ openstack stack show lab-kubernetes-01
 ```
 
 You will know it has successfully completed when the `stack_status` goes into `CREATE_COMPLETE`. If something when wrong, the status will show as `CREATE_FAILED`, and the `stack_status_reason` will provide details of what went wrong.
@@ -45,11 +49,11 @@ You will know it has successfully completed when the `stack_status` goes into `C
 After the Lab has successfully completed building, you will need to fetch the IP Addresses and Credentials of your Lab.  You can do that with the following commands:
 
 ```
-$ openstack stack output list my-stack-name
-$ openstack stack output show my-stack-name master_node_ip_address
-$ openstack stack output show -c output_value -f value my-stack-name worker_nodes_ip_address
-$ openstack stack output show -c output_value -f value my-stack-name password
-$ openstack stack output show -c output_value -f value my-stack-name private_key > private-key.pem
+$ openstack stack output list lab-kubernetes-01
+$ openstack stack output show -c output_value -f value lab-kubernetes-01 master_node_ip_address
+$ openstack stack output show -c output_value -f value lab-kubernetes-01 worker_nodes_ip_address
+$ openstack stack output show -c output_value -f value lab-kubernetes-01 password
+$ openstack stack output show -c output_value -f value lab-kubernetes-01 private_key > private-key.pem
 
 $ chmod 600 private-key.pem
 ```
@@ -57,7 +61,7 @@ $ chmod 600 private-key.pem
 There is both a `password` and a `private_key`, either of which you can use to access the Lab. Below is an example using the `private_key` to access one of the Lab Nodes.
 
 ```
-$ ssh -i private-key.pem root@<worker-or-master-node-ip-address>
+$ ssh -i private-key.pem ubuntu@<worker-or-master-node-ip-address>
 ```
 
 ### Verify Status of Kubernetes
@@ -120,7 +124,7 @@ kube-system   replicaset.apps/kube-dns-86f4d74b45   1         1         1       
 When you are done with your Lab, you can delete the Stack and all of its resources by running the following command:
 
 ```
-$ openstack stack delete --wait my-stack-name
+$ openstack stack delete --yes --wait lab-kubernetes-01
 ```
 
 The `--wait` option will cause the command to not return until the Stack had been fully deleted. If you want the delete to be asynchronous, then you may omit this option.

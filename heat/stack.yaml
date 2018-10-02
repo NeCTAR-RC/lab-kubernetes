@@ -1,6 +1,6 @@
 ---
 heat_template_version: 2015-10-15
-description: "Kubernetes Lab"
+description: "Kubernetes 101 Lab"
 
 parameters:
 
@@ -14,7 +14,7 @@ parameters:
     label: "Lab Repo"
     description: "Lab Repo"
     type: string
-    default: "https://github.com/NeCTAR-RC/lab-kubernetes.git"
+    default: "https://github.com/NeCTAR-RC/kubernetes-101-lab.git"
 
   lab_repo_version:
     label: "Lab Repo Version"
@@ -26,7 +26,7 @@ parameters:
     label: "Availability Zone"
     description: "The availability zone for resources to be created in"
     type: string
-    default: ""
+    default: "melbourne-np"
 
 resources:
 
