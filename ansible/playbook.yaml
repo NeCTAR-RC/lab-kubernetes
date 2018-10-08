@@ -125,7 +125,7 @@
 
     - name: Clone example exercices
       git:
-        repo: 'https://github.com/NeCTAR-RC/kubernetes-101-exercises.git',
+        repo: 'https://github.com/NeCTAR-RC/kubernetes-101-exercises.git'
         dest: /home/ubuntu/lab
         update: no
       become: ubuntu
